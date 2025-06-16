@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HackViz - Cyber Attack Simulator</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding: 30px;
+    }
+    select, button {
+      font-size: 1em;
+      padding: 8px;
+      margin: 10px;
+    }
+    #terminal {
+      background-color: #000;
+      border: 2px solid #0f0;
+      padding: 15px;
+      margin-top: 30px;
+      text-align: left;
+      height: 320px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      box-shadow: 0 0 20px #0f0;
+    }
+    .title {
+      color: #0ff;
+      font-size: 1.6em;
+      margin-bottom: 15px;
+    }
+    .log-line {
+      margin: 5px 0;
+      color: #0f0;
+    }
+  </style>
+</head>
+<body>
+  <h1><span style="color:#f66">🧠</span> <span class="title">HackViz - Cyber Attack Simulator</span></h1>
+  <label for="attack">Select a Hacking Scenario:</label>
+  <select id="attack">
+    <option value="">-- Select Attack --</option>
+    <option value="injection">1. Injection</option>
+    <option value="xss">2. Cross-site Scripting (XSS)</option>
+    <option value="xxe">3. XML External Entities (XXE)</option>
+    <option value="csrf">4. Cross-Site Request Forgery (CSRF)</option>
+    <option value="brokenauth">5. Broken Authentication</option>
+    <option value="sensitiveexposure">6. Sensitive Data Exposure</option>
+    <option value="brokenaccess">7. Broken Access Control</option>
+    <option value="securitymisconfig">8. Security Misconfiguration</option>
+    <option value="insecuredeser">9. Insecure Deserialization</option>
+    <option value="loggingmonitor">10. Insufficient Logging & Monitoring</option>
+  </select>
+  <button onclick="simulateAttack()">Simulate Attack</button>
+
+  <div id="terminal"></div>
+
+  <script>
+    const logs = {
+      injection: [
+        "> Connecting to login endpoint...",
+        "> Injecting SQL payload: ' OR '1'='1...",
+        "> Authentication bypassed...",
+        "> Accessing admin dashboard...",
+        "> Dumping credentials table...",
+        "> Downloading user data...",
+        "> Export complete to attacker's server.",
+        "> No input sanitization found!",
+        "> SQL Injection successful.",
+        "> 🛑 Use parameterized queries!"
+      ],
+      xss: [
+        "> Injecting <script> tag in comment box...",
+        "> Script stored in DB successfully...",
+        "> Victim visits infected page...",
+        "> Script executed in user's browser...",
+        "> Session token captured.",
+        "> Attacker impersonates victim.",
+        "> Stored XSS verified.",
+        "> 🛑 Sanitize input and escape output.",
+        "> Consider CSP headers.",
+        "> XSS mitigation required."
+      ],
+      xxe: [
+        "> Uploading malicious XML with external entity...",
+        "> Parser loaded XML content...",
+        "> External entity triggered.",
+        "> Reading /etc/passwd...",
+        "> File content exposed.",
+        "> Internal data leaked.",
+        "> No XML validation applied.",
+        "> XXE attack confirmed.",
+        "> 🛑 Disable DTD processing.",
+        "> Validate and sanitize XML input."
+      ],
+      csrf: [
+        "> Victim logged into bank portal.",
+        "> Attacker sends crafted email.",
+        "> Victim clicks hidden image link.",
+        "> Request sent to /transfer-funds.",
+        "> Funds sent to attacker account.",
+        "> No CSRF token found.",
+        "> Exploit successful.",
+        "> 🛑 Implement CSRF tokens.",
+        "> Use SameSite cookies.",
+        "> Validate origin header."
+      ],
+      brokenauth: [
+        "> Testing login page brute-force...",
+        "> Weak passwords accepted...",
+        "> Session token predictable...",
+        "> Hijacking session ID...",
+        "> No 2FA enabled.",
+        "> Login bypassed!",
+        "> Auth system flawed.",
+        "> 🛑 Enforce MFA & strong password policies.",
+        "> Use secure token generation.",
+        "> Monitor auth failures."
+      ],
+      sensitiveexposure: [
+        "> Intercepting network request...",
+        "> Found credentials over HTTP.",
+        "> No encryption in storage.",
+        "> Sensitive PDF file public on S3.",
+        "> Downloaded credit card DB.",
+        "> Data exposed to unauthorized access.",
+        "> 🛑 Use HTTPS and encrypt at rest.",
+        "> Implement access control.",
+        "> Set proper cache controls.",
+        "> Sanitize logs and outputs."
+      ],
+      brokenaccess: [
+        "> Attempting to access /admin as regular user...",
+        "> No role check found.",
+        "> Gained admin privileges.",
+        "> Changing another user's email.",
+        "> Deleting records via API...",
+        "> Access not restricted.",
+        "> 🛑 Implement role-based access control.",
+        "> Deny by default.",
+        "> Log unauthorized attempts.",
+        "> Secure API endpoints."
+      ],
+      securitymisconfig: [
+        "> Scanning for exposed services...",
+        "> Found /phpmyadmin open to internet.",
+        "> Default creds working.",
+        "> Extracted DB dump...",
+        "> Found .env file exposed!",
+        "> API keys and passwords leaked.",
+        "> 🛑 Remove default files & tools.",
+        "> Update software regularly.",
+        "> Harden server config.",
+        "> Use minimal permissions."
+      ],
+      insecuredeser: [
+        "> Sending crafted serialized object...",
+        "> Object deserialized on server...",
+        "> Executing system command.",
+        "> Reverse shell triggered.",
+        "> Server compromised.",
+        "> 🛑 Validate and restrict objects.",
+        "> Use signed serialization only.",
+        "> Avoid native deserialization.",
+        "> Whitelist object classes.",
+        "> Enable RASP solutions."
+      ],
+      loggingmonitor: [
+        "> 1000 failed logins from single IP...",
+        "> No alert triggered.",
+        "> Payload executed via API...",
+        "> No trace in logs.",
+        "> No anomaly detection in place.",
+        "> Attackers untraceable.",
+        "> 🛑 Enable real-time alerts.",
+        "> Centralize logging systems.",
+        "> Log critical events.",
+        "> Conduct routine audits."
+      ]
+    };
+
+    function simulateAttack() {
+      const selected = document.getElementById("attack").value;
+      const terminal = document.getElementById("terminal");
+      terminal.innerHTML = "";
+
+      if (!logs[selected]) {
+        const err = document.createElement("div");
+        err.className = "log-line";
+        err.textContent = "> ❌ Please select a valid attack scenario.";
+        terminal.appendChild(err);
+        return;
+      }
+
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i >= logs[selected].length) {
+          clearInterval(interval);
+          return;
+        }
+        const log = document.createElement("div");
+        log.className = "log-line";
+        log.textContent = logs[selected][i++];
+        terminal.appendChild(log);
+        terminal.scrollTop = terminal.scrollHeight;
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #111;
+  color: #eee;
+  text-align: center;
+}
+
+select {
+  font-size: 1em;
+  padding: 8px;
+  margin-top: 10px;
+}
+
+.animation-box {
+  margin-top: 40px;
+}
+
+.virus {
+  fill: limegreen;
+  animation: moveVirus 2s infinite alternate ease-in-out;
+}
+
+@keyframes moveVirus {
+  0% { transform: translate(0px, 0px); }
+  100% { transform: translate(20px, 20px); }
+}
+
+.lock {
+  fill: crimson;
+  animation: shakeLock 0.6s infinite;
+}
+
+@keyframes shakeLock {
+  0% { transform: translate(0px, 0px); }
+  25% { transform: translate(2px, -2px); }
+  50% { transform: translate(-2px, 2px); }
+  75% { transform: translate(2px, 2px); }
+  100% { transform: translate(0px, 0px); }
+}
